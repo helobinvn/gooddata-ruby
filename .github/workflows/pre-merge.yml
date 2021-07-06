@@ -19,6 +19,10 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
       - run: bundle exec rake test:unit
+        if: ${{ matrix.ruby-version != 'jruby-9.1.14' }}
+      - run: bundle exec rake test:unit
+        if: ${{ matrix.ruby-version == 'jruby-9.1.14' }}
+        continue-on-error: true
   sdk-integration-tests:
     runs-on: ubuntu-16.04
     strategy:
@@ -34,8 +38,10 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - run: bundle exec rake test:sdk
-      - run: bundle exec rake test:project
+      - name: sdk integration (vcr) tests - base
+        run: bundle exec rake test:sdk
+      - name: sdk integration (vcr) tests - project
+        run: bundle exec rake test:project
   lcm-integration-tests:
     runs-on: ubuntu-16.04
     strategy:
@@ -51,4 +57,5 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - run: bundle exec rspec spec/lcm/integration/lcm_end_to_end_spec.rb
+      - name: lcm integration (vcr) tests - e2e
+        run: bundle exec rspec spec/lcm/integration/lcm_end_to_end_spec.rb
