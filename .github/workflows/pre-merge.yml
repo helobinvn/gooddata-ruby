@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-16.04
     strategy:
       matrix:
-        ruby-version: [2.3, 2.4, 2.5, 2.6, jruby-9.1.14]
+        ruby-version: [2.3, 2.4, 2.5, 2.6, jruby-9.1.17]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -19,9 +19,9 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
       - run: bundle exec rake test:unit
-        if: ${{ matrix.ruby-version != 'jruby-9.1.14' }}
+        if: ${{ matrix.ruby-version != 'jruby-9.1.17' }}
       - run: bundle exec rake test:unit
-        if: ${{ matrix.ruby-version == 'jruby-9.1.14' }}
+        if: ${{ matrix.ruby-version == 'jruby-9.1.17' }}
         continue-on-error: true
   sdk-integration-tests:
     runs-on: ubuntu-16.04
@@ -59,3 +59,16 @@ jobs:
           bundler-cache: true
       - name: lcm integration (vcr) tests - e2e
         run: bundle exec rspec spec/lcm/integration/lcm_end_to_end_spec.rb
+  pronto-code-review:
+    runs-on: ubuntu-16.04
+    steps: before-merge
+    run: |
+      git remote add upstream https://github.com/gooddata/gooddata-ruby.git
+      git fetch upstream develop
+      failed=0
+      PRONTO_FLAY_MASS_THRESHOLD=50 bundle exec pronto run -c upstream/develop --exit-code lib || failed=1
+      PRONTO_FLAY_MASS_THRESHOLD=100 bundle exec pronto run -c upstream/develop --exit-code spec || failed=1
+      if [ "$failed" -ne 0 ] ; then
+          exit 1
+      fi
+    shell: bash
