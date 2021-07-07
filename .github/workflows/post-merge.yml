@@ -1,4 +1,4 @@
-name: Post-merge
+name: post-merge
 on:
   workflow_dispatch
 #  schedule:
