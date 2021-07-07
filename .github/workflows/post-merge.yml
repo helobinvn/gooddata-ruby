@@ -48,6 +48,7 @@ jobs:
           - gd_env: staging
           - gd_env: testing
           - gd_env: development
+    concurrency: ${{ matrix.gd_env }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -69,157 +70,157 @@ jobs:
         env:
           VCR_ON: ${{ env.vcr_on }}
           GD_ENV: ${{ matrix.gd_env }}
-        continue-on-error: true
-  userprov-tests:
-    runs-on: ubuntu-16.04
-    env:
-      vcr_on: false
-      ruby-version: jruby-9.1.17
-    strategy:
-      matrix:
-        include:
-          - gd_env: staging
-          - gd_env: testing
-          - gd_env: development
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ env.ruby-version }}
-          bundler-cache: true
-      - uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: run tests
-        run: |
-          bundle exec rake -f lcm.rake docker:build
-          bundle exec rake -f lcm.rake docker:bundle
-          bundle exec rake -f lcm.rake test:docker:userprov
-        env:
-          VCR_ON: ${{ env.vcr_on }}
-          GD_ENV: ${{ matrix.gd_env }}
-        continue-on-error: true
-  bricks-smoke-tests:
-    runs-on: ubuntu-16.04
-    env:
-      vcr_on: false
-      ruby-version: jruby-9.1.17
-    strategy:
-      matrix:
-        include:
-          - gd_env: staging
-          - gd_env: testing
-          - gd_env: development
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ env.ruby-version }}
-          bundler-cache: true
-      - uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: run tests
-        run: |
-          sudo keytool -importcert -alias gooddata-2008 -file "./data/2008.crt" -keystore $JAVA_HOME/jre/lib/security/cacerts -trustcacerts -storepass 'changeit' -noprompt
-          sudo keytool -importcert -alias gooddata-int -file "./data/new_ca.cer" -keystore $JAVA_HOME/jre/lib/security/cacerts -trustcacerts -storepass 'changeit' -noprompt
-          sudo keytool -importcert -alias gooddata-prod -file "data/new_prodgdc_ca.crt" -keystore $JAVA_HOME/jre/lib/security/cacerts -trustcacerts -storepass 'changeit' -noprompt
-          bundle exec rake -f lcm.rake test:smoke
-        env:
-          VCR_ON: ${{ env.vcr_on }}
-          GD_ENV: ${{ matrix.gd_env }}
-        continue-on-error: true
-  sdk-integration-tests:
-    runs-on: ubuntu-16.04
-    env:
-      vcr_on: false
-      ruby-version: jruby-9.1.17
-    strategy:
-      matrix:
-        include:
-          - gd_env: staging
-          - gd_env: testing
-          - gd_env: development
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ env.ruby-version }}
-          bundler-cache: true
-      - uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: run tests
-        run: bundle exec rake test:sdk
-        env:
-          VCR_ON: ${{ env.vcr_on }}
-          GD_ENV: ${{ matrix.gd_env }}
-        continue-on-error: true
-  sdk-integration-tests-project:
-    runs-on: ubuntu-16.04
-    env:
-      vcr_on: false
-      ruby-version: jruby-9.1.17
-    strategy:
-      matrix:
-        include:
-          - gd_env: staging
-          - gd_env: testing
-          - gd_env: development
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ env.ruby-version }}
-          bundler-cache: true
-      - uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: run tests
-        run: bundle exec rake test:sdk
-        env:
-          VCR_ON: ${{ env.vcr_on }}
-          GD_ENV: ${{ matrix.gd_env }}
-        continue-on-error: true
-  test-environment-clean-up:
-    runs-on: ubuntu-16.04
-    env:
-      ruby-version: 2.5
-    strategy:
-      matrix:
-        include:
-          - gd_env: staging
-          - gd_env: testing
-          - gd_env: development
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ env.ruby-version }}
-          bundler-cache: true
-      - uses: actions/setup-java@v2
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-      - name: run tests
-        run: bundle exec ruby bin/test_projects_cleanup.rb -f
-        env:
-          GD_ENV: ${{ matrix.gd_env }}
-        continue-on-error: true
+        
+#  userprov-tests:
+#    runs-on: ubuntu-16.04
+#    env:
+#      vcr_on: false
+#      ruby-version: jruby-9.1.17
+#    strategy:
+#      matrix:
+#        include:
+#          - gd_env: staging
+#          - gd_env: testing
+#          - gd_env: development
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ env.ruby-version }}
+#          bundler-cache: true
+#      - uses: actions/setup-java@v2
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#      - name: run tests
+#        run: |
+#          bundle exec rake -f lcm.rake docker:build
+#          bundle exec rake -f lcm.rake docker:bundle
+#          bundle exec rake -f lcm.rake test:docker:userprov
+#        env:
+#          VCR_ON: ${{ env.vcr_on }}
+#          GD_ENV: ${{ matrix.gd_env }}
+#        
+#  bricks-smoke-tests:
+#    runs-on: ubuntu-16.04
+#    env:
+#      vcr_on: false
+#      ruby-version: jruby-9.1.17
+#    strategy:
+#      matrix:
+#        include:
+#          - gd_env: staging
+#          - gd_env: testing
+#          - gd_env: development
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ env.ruby-version }}
+#          bundler-cache: true
+#      - uses: actions/setup-java@v2
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#      - name: run tests
+#        run: |
+#          sudo keytool -importcert -alias gooddata-2008 -file "./data/2008.crt" -keystore $JAVA_HOME/jre/lib/security/cacerts -trustcacerts -storepass 'changeit' -noprompt
+#          sudo keytool -importcert -alias gooddata-int -file "./data/new_ca.cer" -keystore $JAVA_HOME/jre/lib/security/cacerts -trustcacerts -storepass 'changeit' -noprompt
+#          sudo keytool -importcert -alias gooddata-prod -file "data/new_prodgdc_ca.crt" -keystore $JAVA_HOME/jre/lib/security/cacerts -trustcacerts -storepass 'changeit' -noprompt
+#          bundle exec rake -f lcm.rake test:smoke
+#        env:
+#          VCR_ON: ${{ env.vcr_on }}
+#          GD_ENV: ${{ matrix.gd_env }}
+#        
+#  sdk-integration-tests:
+#    runs-on: ubuntu-16.04
+#    env:
+#      vcr_on: false
+#      ruby-version: jruby-9.1.17
+#    strategy:
+#      matrix:
+#        include:
+#          - gd_env: staging
+#          - gd_env: testing
+#          - gd_env: development
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ env.ruby-version }}
+#          bundler-cache: true
+#      - uses: actions/setup-java@v2
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#      - name: run tests
+#        run: bundle exec rake test:sdk
+#        env:
+#          VCR_ON: ${{ env.vcr_on }}
+#          GD_ENV: ${{ matrix.gd_env }}
+#        
+#  sdk-integration-tests-project:
+#    runs-on: ubuntu-16.04
+#    env:
+#      vcr_on: false
+#      ruby-version: jruby-9.1.17
+#    strategy:
+#      matrix:
+#        include:
+#          - gd_env: staging
+#          - gd_env: testing
+#          - gd_env: development
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ env.ruby-version }}
+#          bundler-cache: true
+#      - uses: actions/setup-java@v2
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#      - name: run tests
+#        run: bundle exec rake test:sdk
+#        env:
+#          VCR_ON: ${{ env.vcr_on }}
+#          GD_ENV: ${{ matrix.gd_env }}
+#        
+#  test-environment-clean-up:
+#    runs-on: ubuntu-16.04
+#    env:
+#      ruby-version: 2.5
+#    strategy:
+#      matrix:
+#        include:
+#          - gd_env: staging
+#          - gd_env: testing
+#          - gd_env: development
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ env.ruby-version }}
+#          bundler-cache: true
+#      - uses: actions/setup-java@v2
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#      - name: run tests
+#        run: bundle exec ruby bin/test_projects_cleanup.rb -f
+#        env:
+#          GD_ENV: ${{ matrix.gd_env }}
+#        
   unit-tests-other-platforms:
     runs-on: macos-latest
     strategy:
@@ -233,7 +234,7 @@ jobs:
             xcode_version: 9
           - ruby-version: 2.6
             xcode_version: 9
-          - ruby-version: jruby-9.1.14
+          - ruby-version: jruby-9.1.17
             xcode_version: latest
     steps:
       - uses: actions/checkout@v2
