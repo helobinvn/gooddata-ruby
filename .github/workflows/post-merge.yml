@@ -6,7 +6,7 @@ on:
 #    - cron: '30 5 * * *'
 env:
   vcr_on: false
-  ruby-version: 2.5
+  ruby-version: jruby-9.1.17
 jobs:
   lcm-integration-tests:
     runs-on: ubuntu-16.04
@@ -39,3 +39,35 @@ jobs:
         env:
           VCR_ON: ${{ env.vcr_on }}
           GD_ENV: ${{ matrix.gd_env }}
+        continue-on-error: true
+#  lcm-slow-tests:
+#    runs-on: ubuntu-16.04
+#    strategy:
+#      matrix:
+#        include:
+#          - gd_env_name: staging1
+#            gd_env: staging1
+#          - gd_env_name: staging2
+#            gd_env: testing
+#          - gd_env_name: staging3
+#            gd_env: development
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ env.ruby-version }}
+#          bundler-cache: true
+#      - uses: actions/setup-java@v2
+#        with:
+#          java-version: '8'
+#          distribution: 'adopt'
+#      - name: run tests
+#        run: |
+#          bundle exec rake -f lcm.rake docker:build
+#          bundle exec rake -f lcm.rake docker:bundle
+#          bundle exec rake -f lcm.rake test:docker:integration
+#        env:
+#          VCR_ON: ${{ env.vcr_on }}
+#          GD_ENV: ${{ matrix.gd_env }}
