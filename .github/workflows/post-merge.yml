@@ -243,8 +243,5 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-           xcode-version: ${{ xcode_version }}
       - name: run tests
         run: bundle exec rake test:unit
