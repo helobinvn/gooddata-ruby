@@ -30,6 +30,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           java-version: '8'
+          distribution: 'adopt'
       - name: run tests
         run: |
           bundle exec rake -f lcm.rake docker:build
