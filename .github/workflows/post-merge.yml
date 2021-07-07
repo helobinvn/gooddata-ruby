@@ -48,7 +48,7 @@ jobs:
           - gd_env: staging
           - gd_env: testing
           - gd_env: development
-    concurrency: ${{ matrix.gd_env }}
+#    concurrency: ${{ matrix.gd_env }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -221,28 +221,28 @@ jobs:
 #        env:
 #          GD_ENV: ${{ matrix.gd_env }}
 #        
-  unit-tests-other-platforms:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        include:
-          - ruby-version: 2.3
-            xcode_version: 7.3
-          - ruby-version: 2.4.3
-            xcode_version: 9.4
-          - ruby-version: 2.5
-            xcode_version: 9
-          - ruby-version: 2.6
-            xcode_version: 9
-          - ruby-version: jruby-9.1.17
-            xcode_version: latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
-      - name: run tests
-        run: bundle exec rake test:unit
+#  unit-tests-other-platforms:
+#    runs-on: macos-latest
+#    strategy:
+#      matrix:
+#        include:
+#          - ruby-version: 2.3
+#            xcode_version: 7.3
+#          - ruby-version: 2.4.3
+#            xcode_version: 9.4
+#          - ruby-version: 2.5
+#            xcode_version: 9
+#          - ruby-version: 2.6
+#            xcode_version: 9
+#          - ruby-version: jruby-9.1.17
+#            xcode_version: latest
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: ${{ matrix.ruby-version }}
+#          bundler-cache: true
+#      - name: run tests
+#        run: bundle exec rake test:unit
